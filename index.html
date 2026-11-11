@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Life Presentation</title>
+<style>
+@font-face{font-family:P;src:url(fonts/Poppins-Regular.ttf);font-weight:400}
+@font-face{font-family:P;src:url(fonts/Poppins-Medium.ttf);font-weight:500}
+@font-face{font-family:P;src:url(fonts/Poppins-SemiBold.ttf);font-weight:600}
+@font-face{font-family:P;src:url(fonts/Poppins-Bold.ttf);font-weight:700}
+@font-face{font-family:P;src:url(fonts/Poppins-Black.ttf);font-weight:900}
+:root{--b:#fff;--c:#ccc;--g:#8a8a8a;--l:rgba(255,255,255,.14);--e:cubic-bezier(.2,.75,.15,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:P,system-ui,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#palco{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .7s ease,visibility 0s .7s;overflow:hidden}
+.slide.on{opacity:1;visibility:visible;transition:opacity .7s ease}
+.fundo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.veu-e{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.72) 38%,rgba(0,0,0,.15) 70%,rgba(0,0,0,0) 100%)}
+.veu-c{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.35) 22%,rgba(0,0,0,0) 45%)}
+.veu-b{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,0) 40%)}
+.grao{position:absolute;inset:0;pointer-events:none;opacity:.06;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* tipografia */
+.k{font-weight:600;font-size:22px;letter-spacing:7px;text-transform:uppercase;color:var(--c)}
+.t1{font-weight:800;font-size:92px;line-height:1.02;letter-spacing:-2px;text-transform:uppercase}
+.t2{font-weight:800;font-size:68px;line-height:1.04;letter-spacing:-1px;text-transform:uppercase}
+.sub{font-weight:400;font-size:40px;line-height:1.25;color:#eee}
+.txt{font-weight:400;font-size:31px;line-height:1.45;color:#e9e9e9}
+.mini{font-weight:500;font-size:19px;letter-spacing:1px;color:var(--g)}
+.linha{height:2px;background:#fff;width:120px}
+b,strong{font-weight:700;color:#fff}
+
+/* entradas (só rodam quando o slide está .on) */
+.a{opacity:0}
+.on .a{animation:sobe .95s var(--e) forwards;animation-delay:var(--d,0s)}
+.on .a.esq{animation-name:esq}.on .a.dir{animation-name:dir}.on .a.zoom{animation-name:zoom}
+.on .a.wipe{animation-name:wipe;animation-duration:1.2s}.on .a.fade{animation-name:fade;animation-duration:1.4s}
+.on .a.cresce{animation-name:cresce;animation-duration:1.1s}
+@keyframes sobe{from{opacity:0;transform:translateY(46px);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes esq{from{opacity:0;transform:translateX(-70px);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes dir{from{opacity:0;transform:translateX(90px);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes zoom{from{opacity:0;transform:scale(.86);filter:blur(12px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes wipe{from{opacity:1;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes cresce{from{opacity:1;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+.cresce{transform-origin:0 50%}
+.on .kb{animation:kb 16s linear forwards}.on .kb2{animation:kb2 16s linear forwards}
+@keyframes kb{from{transform:scale(1.04)}to{transform:scale(1.16) translate(-1.5%,-1%)}}
+@keyframes kb2{from{transform:scale(1.16) translate(1.5%,0)}to{transform:scale(1.04)}}
+.palavra{display:inline-block;opacity:0}
+.on .palavra{animation:sobe .9s var(--e) forwards}
+
+/* moldura fixa */
+#marca{position:absolute;right:56px;bottom:44px;width:86px;opacity:.9;z-index:50;transition:opacity .5s}
+#num{position:absolute;left:64px;bottom:46px;z-index:50;font-weight:600;font-size:18px;letter-spacing:4px;color:rgba(255,255,255,.55)}
+#barra{position:absolute;left:0;top:0;height:3px;background:#fff;z-index:60;transition:width .7s var(--e);box-shadow:0 0 12px rgba(255,255,255,.7)}
+#dica{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);z-index:60;font-size:17px;letter-spacing:2px;color:rgba(255,255,255,.5);transition:opacity 1s}
+.esconde{opacity:0!important}
+
+/* componentes */
+.chip{display:inline-flex;align-items:center;gap:14px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:999px;padding:14px 28px;font-weight:500;font-size:26px}
+.vidro{background:rgba(12,14,18,.55);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-radius:28px}
+.ico{width:46px;height:46px;flex:none;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.item{display:flex;align-items:flex-start;gap:22px}
+.tag{position:absolute;font-weight:600;font-size:17px;letter-spacing:3px;text-transform:uppercase;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.25);padding:9px 16px;border-radius:8px;backdrop-filter:blur(8px)}
+.foto{position:absolute;overflow:hidden;border-radius:22px;box-shadow:0 40px 90px rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12)}
+.foto img,.foto video{width:100%;height:100%;object-fit:cover;display:block}
+.brilho{position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%)}
+.on .brilho{animation:brilho 1.6s ease-out forwards;animation-delay:var(--d,0s)}
+@keyframes brilho{to{transform:translateX(120%)}}
+.fonte{position:absolute;font-size:17px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+
+/* projetos */
+.proj .cab{position:absolute;left:120px;top:110px;width:640px}
+.proj .n{font-weight:900;font-size:150px;line-height:1;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.35);margin:26px 0 6px}
+
+/* controle de vídeo (play/pausa) */
+.ctrl{position:absolute;z-index:40;display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 24px 0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;font:600 19px/1 P,system-ui;letter-spacing:2px;text-transform:uppercase;cursor:pointer;user-select:none;transition:background .25s,transform .25s;opacity:0}
+.on .ctrl{animation:fade 1s ease forwards;animation-delay:1.2s}
+.ctrl:hover{background:rgba(255,255,255,.18);transform:scale(1.04)}
+.ctrl svg{width:22px;height:22px;fill:#fff}
+.ctrl .ip{display:none}.ctrl.tocando .ip{display:block}.ctrl.tocando .ipl{display:none}
+.ctrl .lb::after{content:"Play"}.ctrl.tocando .lb::after{content:"Pause"}
+.foto .ctrl{right:18px;bottom:18px}
+.foto video{cursor:pointer}
+/* tour 360 (último slide) */
+.t360{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.btn360{position:absolute;z-index:40;display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 26px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;font:600 19px/1 P,system-ui;letter-spacing:2px;text-transform:uppercase;cursor:pointer;user-select:none;transition:background .25s}
+.btn360:hover{background:rgba(255,255,255,.18)}
+</style>
+</head>
+<body>
+<div id="palco">
+<div id="barra"></div>
+<img id="marca" src="img/marca.png" alt="">
+<div id="num"></div>
+<div id="dica">→ next · ← back · P pause video · F full screen</div>
+
+<!-- 1 · CAPA -->
+<section class="slide" data-nome="capa">
+  <video class="fundo" src="video/capa.mp4" muted loop playsinline preload="auto"></video>
+  <div class="veu-e" style="background:linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.55) 50%,rgba(0,0,0,.2))"></div>
+  <div class="grao"></div>
+  <div style="position:absolute;left:120px;top:250px;width:1720px">
+    <div class="k a" style="--d:.2s">Itapema &amp; Porto Belo</div>
+    <div class="linha a cresce" style="--d:.45s;margin:34px 0 40px"></div>
+    <div class="a" style="--d:.6s;font-weight:300;font-size:74px;line-height:1.1"><span>Brazil's fastest-growing</span></div>
+    <div style="font-weight:800;font-size:132px;line-height:1;letter-spacing:-4px;margin-top:10px;white-space:nowrap">
+      <span class="palavra" style="animation-delay:.95s">real</span> <span class="palavra" style="animation-delay:1.15s">estate</span> <span class="palavra" style="animation-delay:1.35s">market</span>
+    </div>
+  </div>
+  <div style="position:absolute;left:120px;bottom:120px;display:flex;gap:18px">
+    <div class="chip a" style="--d:1.9s">Security</div><div class="chip a" style="--d:2.05s">Appreciation</div><div class="chip a" style="--d:2.2s">Long-term vision</div>
+  </div>
+  <img src="img/logo.png" class="a fade" style="--d:1.2s;position:absolute;right:120px;top:120px;width:250px" alt="">
+</section>
+
+<!-- 2 · INSTITUCIONAL -->
+<section class="slide" data-nome="institucional">
+  <div class="foto a zoom" style="--d:.1s;left:250px;top:90px;width:1420px;height:799px">
+    <video id="videoInst" data-ctrl src="midia/institucional.mp4" poster="img/institucional.jpg" muted playsinline preload="metadata" style="display:none"></video>
+    <img id="fotoInst" class="kb" src="img/institucional.jpg" alt="">
+    <div class="brilho" style="--d:.8s"></div>
+  </div>
+  <div class="sub a" style="--d:.7s;position:absolute;left:0;right:0;top:930px;text-align:center;font-size:38px">We connect <b>Brazilians living abroad</b> with<br>the best investments in <b>Santa Catarina</b></div>
+</section>
+
+<!-- 3 · QUEM VAI TE ORIENTAR -->
+<section class="slide" data-nome="corretor">
+  <div style="position:absolute;right:-80px;top:80px;width:1100px;height:1100px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),rgba(255,255,255,0) 62%)" class="a fade" ></div>
+  <img src="img/alan.png" class="a dir" style="--d:.25s;position:absolute;right:120px;bottom:0;height:1000px" alt="Alan Teixeira">
+  <div style="position:absolute;left:120px;top:120px;width:1000px">
+    <div class="k a" style="--d:.1s">Your advisor</div>
+    <div class="a" style="--d:.3s;font-weight:800;font-size:104px;line-height:1;letter-spacing:-2px;margin-top:26px">Alan<br>Teixeira</div>
+    <div class="linha a cresce" style="--d:.6s;margin:38px 0 34px"></div>
+    <div class="sub a" style="--d:.7s;font-size:34px;color:var(--c)">Real estate investments · Santa Catarina coast</div>
+    <div style="display:flex;flex-direction:column;gap:20px;margin-top:40px">
+      <div class="item a esq" style="--d:.95s"><svg class="ico" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="M6 24h36M24 6c6 6 6 30 0 36M24 6c-6 6-6 30 0 36"/></svg><div class="txt">Consultative service for Brazilians living abroad</div></div>
+      <div class="item a esq" style="--d:1.1s"><svg class="ico" viewBox="0 0 48 48"><path d="M4 34c6-4 10-4 16 0s10 4 16 0 8-3 8-3"/><path d="M14 28V14l10-6 10 6v14"/></svg><div class="txt">Experience on the Santa Catarina coast</div></div>
+      <div class="item a esq" style="--d:1.25s"><svg class="ico" viewBox="0 0 48 48"><path d="M8 24l10 10L40 12"/></svg><div class="txt">Full support, even from a distance</div></div>
+    </div>
+    <div class="vidro a" style="--d:1.5s;margin-top:44px;padding:30px 36px;width:900px;font-size:27px;line-height:1.5;color:#ddd;font-style:italic">“I guide Brazilians living abroad to invest on the Santa Catarina coast with security, clarity and strategy, even from a distance.”</div>
+  </div>
+</section>
+
+<!-- 4 · POR QUE A NEW LIFE -->
+<section class="slide" data-nome="porque">
+  <img class="fundo kb" src="img/escritorio.jpg" alt="" style="filter:brightness(.32) saturate(.6)">
+  <div class="veu-c"></div>
+  <div style="position:absolute;left:120px;top:96px">
+    <div class="k a" style="--d:.1s">How we work</div>
+    <div class="t1 a" style="--d:.25s;margin-top:18px">Why New Life</div>
+  </div>
+  <div style="position:absolute;left:120px;right:120px;top:360px;display:grid;grid-template-columns:1fr 1fr;gap:26px 40px">
+    <div class="vidro item a" style="--d:.5s;padding:28px 32px"><svg class="ico" viewBox="0 0 48 48"><path d="M8 10h32v20H22l-8 8v-8H8z"/></svg><div class="txt">Consultative service, <b>no impulse selling</b></div></div>
+    <div class="vidro item a" style="--d:.62s;padding:28px 32px"><svg class="ico" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="M6 24h36M24 6c6 6 6 30 0 36M24 6c-6 6-6 30 0 36"/></svg><div class="txt">Real estate investments for <b>people living abroad</b></div></div>
+    <div class="vidro item a" style="--d:.74s;padding:28px 32px"><svg class="ico" viewBox="0 0 48 48"><path d="M24 4l16 6v12c0 10-7 18-16 22C15 40 8 32 8 22V10z"/><path d="M17 24l5 5 9-10"/></svg><div class="txt">A <b>clear, secure and guided</b> process from start to finish</div></div>
+    <div class="vidro item a" style="--d:.86s;padding:28px 32px"><svg class="ico" viewBox="0 0 48 48"><path d="M8 30v-8a6 6 0 0 1 12 0h8a6 6 0 0 1 12 0v8z"/><path d="M8 30v6M40 30v6M20 22v-6h8v6"/></svg><div class="txt">Full support with <b>furnishing and preparing</b> the property</div></div>
+    <div class="vidro item a" style="--d:.98s;padding:28px 32px"><svg class="ico" viewBox="0 0 48 48"><circle cx="17" cy="24" r="8"/><path d="M25 24h17M36 24v7M42 24v5"/></svg><div class="txt">Dedicated <b>rental</b> team (monthly and vacation stays)</div></div>
+    <div class="vidro item a" style="--d:1.1s;padding:28px 32px"><svg class="ico" viewBox="0 0 48 48"><path d="M10 42V18h12v24M22 42V8h16v34M6 42h36M27 15h6M27 22h6M27 29h6M14 25h4M14 32h4"/></svg><div class="txt">We follow the <b>construction from start to handover</b></div></div>
+    <div class="vidro item a" style="--d:1.22s;padding:28px 32px;grid-column:1 / span 2;justify-self:center;width:calc(50% - 20px)"><svg class="ico" viewBox="0 0 48 48"><path d="M24 6l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/></svg><div class="txt"><b>Exclusive terms</b> for Brazilians living abroad</div></div>
+  </div>
+</section>
+
+<!-- 5 · CONSTRUTORAS -->
+<section class="slide" data-nome="construtoras">
+  <div style="position:absolute;left:120px;top:96px;width:900px">
+    <div class="k a" style="--d:.1s">Who we work with</div>
+    <div class="t2 a" style="--d:.25s;margin-top:18px">Selected and vetted developers</div>
+  </div>
+  <div style="position:absolute;left:1120px;top:110px;width:680px;display:flex;flex-direction:column;gap:20px">
+    <div class="item a dir" style="--d:.5s"><svg class="ico" viewBox="0 0 48 48" style="width:38px;height:38px"><circle cx="24" cy="24" r="19"/><path d="M15 24l6 6 12-13"/></svg><div class="txt" style="font-size:28px">Have already delivered projects in the region</div></div>
+    <div class="item a dir" style="--d:.62s"><svg class="ico" viewBox="0 0 48 48" style="width:38px;height:38px"><circle cx="24" cy="24" r="19"/><path d="M15 24l6 6 12-13"/></svg><div class="txt" style="font-size:28px">Proven track record and financial strength</div></div>
+    <div class="item a dir" style="--d:.74s"><svg class="ico" viewBox="0 0 48 48" style="width:38px;height:38px"><circle cx="24" cy="24" r="19"/><path d="M15 24l6 6 12-13"/></svg><div class="txt" style="font-size:28px">Proven standard of finish</div></div>
+    <div class="item a dir" style="--d:.86s"><svg class="ico" viewBox="0 0 48 48" style="width:38px;height:38px"><circle cx="24" cy="24" r="19"/><path d="M15 24l6 6 12-13"/></svg><div class="txt" style="font-size:28px"><b>Vetted by our legal team</b></div></div>
+  </div>
+  <div id="logos" style="position:absolute;left:120px;right:120px;top:480px;display:grid;grid-template-columns:repeat(6,1fr);gap:18px"></div>
+</section>
+
+<!-- 6 · ONDE VOCÊ VAI INVESTIR (globo) -->
+<section class="slide" data-nome="globo">
+  <video class="fundo" src="video/globo.mp4" muted playsinline preload="auto" data-uma-vez></video>
+  <div class="veu-c" style="background:linear-gradient(180deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,0) 28%)"></div>
+  <div style="position:absolute;left:120px;top:90px">
+    <div class="t1 a" style="--d:.2s">Where you'll invest</div>
+    <div class="sub a" style="--d:.5s;margin-top:12px">Northern coast of Santa Catarina</div>
+  </div>
+  <div class="mini a fade" style="--d:2s;position:absolute;right:170px;bottom:48px">Satellite: EOxCloudless 2016 (EOX, Copernicus Sentinel) · Boundaries: IBGE and © OpenStreetMap</div>
+</section>
+
+<!-- 7 · LOCALIZAÇÃO ESTRATÉGICA -->
+<section class="slide" data-nome="local">
+  <video class="fundo" id="videoLocal" src="video/local.mp4" muted playsinline preload="auto" data-uma-vez></video>
+  <div class="veu-e" style="background:linear-gradient(90deg,rgba(0,0,0,.86) 0%,rgba(0,0,0,.6) 26%,rgba(0,0,0,0) 46%)"></div>
+  <div style="position:absolute;left:110px;top:90px;width:640px">
+    <div class="t2 a" style="--d:.2s;font-size:62px">Strategic location</div>
+    <div class="txt a" style="--d:.45s;margin-top:14px;color:var(--c);font-size:26px">Driving distances from downtown Itapema</div>
+    <div class="mini a" style="--d:.6s;margin-top:6px;font-size:16px">Routes: OpenStreetMap/OSRM · estimated time without traffic</div>
+    <div id="rotas" style="margin-top:30px;display:flex;flex-direction:column;gap:10px">
+      <div class="rota" data-t="2.67"><span>Porto Belo</span><em>12 km</em><i>≈ 20 min</i></div>
+      <div class="rota" data-t="3.85"><span>Balneário Camboriú</span><em>13.7 km</em><i>≈ 15 min</i></div>
+      <div class="rota" data-t="5.26"><span>Bombinhas</span><em>17.4 km</em><i>≈ 30 min</i></div>
+      <div class="rota" data-t="8.0"><span>Itajaí</span><em>28.8 km</em><i>≈ 30 min</i></div>
+      <div class="rota av" data-t="9.78"><span>Navegantes Airport</span><em>43.9 km</em><i>≈ 40 min</i></div>
+      <div class="rota" data-t="13.19"><span>São José</span><em>64.9 km</em><i>≈ 55 min</i></div>
+      <div class="rota av" data-t="14.74"><span>Florianópolis Airport</span><em>77.2 km</em><i>≈ 1h 10</i></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · CRESCIMENTO POPULACIONAL -->
+<section class="slide" data-nome="populacao">
+  <div style="position:absolute;left:120px;top:110px;width:700px">
+    <div class="k a" style="--d:.1s">Demand</div>
+    <div class="t2 a" style="--d:.25s;margin-top:18px">Population growth and demand</div>
+    <div style="display:flex;flex-direction:column;gap:22px;margin-top:50px">
+      <div class="item a esq" style="--d:.6s"><span class="pt"></span><div class="txt">Steady arrival of new residents</div></div>
+      <div class="item a esq" style="--d:.75s"><span class="pt"></span><div class="txt">Brazilians returning from abroad</div></div>
+      <div class="item a esq" style="--d:.9s"><span class="pt"></span><div class="txt">High demand for housing and investment</div></div>
+      <div class="item a esq" style="--d:1.05s"><span class="pt"></span><div class="txt">Continuous urban growth</div></div>
+    </div>
+    <div class="chip a" style="--d:3.6s;margin-top:70px;font-size:22px;padding:12px 22px"><i class="pulso"></i>In high season, Itapema welcomes<br>more than 1 million people</div>
+  </div>
+  <div class="vidro a zoom" style="--d:.35s;position:absolute;left:900px;top:110px;width:900px;height:830px;padding:44px 50px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:600;font-size:23px;white-space:nowrap">Residents · Itapema and Porto Belo</div>
+      <div style="display:flex;gap:16px;font-size:17px;color:var(--c);white-space:nowrap"><span><i class="lg" style="background:rgba(255,255,255,.32)"></i>2010</span><span><i class="lg" style="background:rgba(255,255,255,.62)"></i>2022</span><span><i class="lg" style="background:#fff"></i>2026 · estimate</span></div>
+    </div>
+    <div id="graf" style="position:absolute;left:50px;right:50px;bottom:150px;height:500px;display:flex;justify-content:space-around;align-items:flex-end;border-bottom:1px solid rgba(255,255,255,.3)">
+      <div class="grupo"><div class="bar b10" style="--h:.5155;--d:.9s"><span data-conta="45797" data-sep="1"></span></div><div class="bar b22" style="--h:.8548;--d:1.2s"><span data-conta="75940" data-sep="1"></span></div><div class="bar b26" style="--h:1;--d:1.5s"><span data-conta="88842" data-sep="1"></span></div>
+        <div class="selo" style="--d:2.6s;top:-46px;right:-236px">+94% since 2010</div><div class="nome">Itapema</div></div>
+      <div class="grupo"><div class="bar b10" style="--h:.181;--d:1.7s"><span data-conta="16083" data-sep="1"></span></div><div class="bar b22" style="--h:.3117;--d:2.0s"><span data-conta="27688" data-sep="1"></span></div><div class="bar b26" style="--h:.3671;--d:2.3s"><span data-conta="32615" data-sep="1"></span></div>
+        <div class="selo" style="--d:3.2s;top:120px;right:-60px">+103% since 2010</div><div class="nome">Porto Belo</div></div>
+    </div>
+    <div class="fonte" style="left:50px;bottom:34px">Source: IBGE · 2010 and 2022 Census · 2026 resident population estimate (DOU, Aug 28, 2026) · high season: NSC Total</div>
+  </div>
+</section>
+
+<!-- 9 · INFRAESTRUTURA -->
+<section class="slide" data-nome="infra">
+  <video class="fundo" src="video/infra.mp4" muted loop playsinline preload="auto" poster="img/infra.jpg"></video>
+  <div class="veu-e"></div>
+  <div style="position:absolute;left:120px;top:150px;width:900px">
+    <div class="k a" style="--d:.1s">Itapema today</div>
+    <div class="t1 a" style="--d:.25s;margin-top:18px">Established urban infrastructure</div>
+    <div style="display:flex;flex-direction:column;gap:24px;margin-top:56px">
+      <div class="item a esq" style="--d:.6s"><svg class="ico" viewBox="0 0 48 48"><path d="M6 18l18-10 18 10M10 18v20h28V18M18 38V26h12v12"/></svg><div class="txt">Retail, services and urban mobility</div></div>
+      <div class="item a esq" style="--d:.75s"><svg class="ico" viewBox="0 0 48 48"><path d="M24 40s-14-8-14-19a8 8 0 0 1 14-5 8 8 0 0 1 14 5c0 11-14 19-14 19z"/><path d="M18 23h4l2-4 3 8 2-4h3"/></svg><div class="txt">Healthcare, education and leisure</div></div>
+      <div class="item a esq" style="--d:.9s"><svg class="ico" viewBox="0 0 48 48"><path d="M6 38l12-12 8 8 16-18M32 16h10v10"/></svg><div class="txt">A city ready for continued growth</div></div>
+      <div class="item a esq" style="--d:1.05s"><svg class="ico" viewBox="0 0 48 48"><path d="M8 42V20l16-12 16 12v22z"/><path d="M19 42V28h10v14"/></svg><div class="txt">Infrastructure that supports living and investing</div></div>
+    </div>
+  </div>
+  <div class="mini a fade" style="--d:1.5s;position:absolute;right:170px;bottom:48px">Itapema · New Life aerial footage</div>
+</section>
+
+<!-- 10 · PÍER -->
+<section class="slide proj" data-nome="pier">
+  <div class="cab"><div class="k a" style="--d:.1s">Projects driving appreciation</div><div class="n a" style="--d:.2s">01</div>
+    <div class="t2 a" style="--d:.35s">New tourist pier in Itapema</div></div>
+  <div class="foto a dir" style="--d:.3s;left:800px;top:110px;width:1000px;height:600px"><img class="kb" src="img/pier.jpg" alt=""><div class="brilho" style="--d:1s"></div></div>
+  <div class="foto a sobe" style="--d:.6s;left:1360px;top:560px;width:440px;height:415px"><img class="kb2" src="img/hardrock.jpg" alt=""></div>
+</section>
+
+<!-- 11 · MARINA -->
+<section class="slide proj" data-nome="marina">
+  <div class="cab"><div class="k a" style="--d:.1s">Projects driving appreciation</div><div class="n a" style="--d:.2s">02</div>
+    <div class="t2 a" style="--d:.35s">Marina project at Canto da Praia</div></div>
+  <div class="foto a dir" style="--d:.3s;left:800px;top:110px;width:1000px;height:563px"><video data-ctrl src="video/marina.mp4" poster="img/marina_poster.jpg" muted loop playsinline preload="auto"></video><div class="tag" style="left:18px;top:18px">Illustrative image</div></div>
+  <div class="foto a sobe" style="--d:.6s;left:1180px;top:600px;width:620px;height:380px"><img class="kb" src="img/marina_planta.jpg" alt=""><div class="tag" style="left:18px;bottom:18px">Project plan</div></div>
+</section>
+
+<!-- 12 · BAIRROS PARQUES + NEYMAR -->
+<section class="slide proj" data-nome="bairros">
+  <div class="cab"><div class="k a" style="--d:.1s">Projects driving appreciation</div><div class="n a" style="--d:.2s">03</div>
+    <div class="t2 a" style="--d:.35s;font-size:58px">Brazil's largest park neighborhoods and the new Neymar Jr Ecosystem</div></div>
+  <div class="foto a dir" style="--d:.3s;left:860px;top:110px;width:940px;height:534px"><img class="kb" src="img/bairros.jpg" alt=""><div class="tag" style="left:18px;top:18px">Park neighborhoods · illustrative image</div><div class="brilho" style="--d:1s"></div></div>
+  <div class="foto a sobe" style="--d:.6s;left:1340px;top:560px;width:460px;height:420px"><img class="kb2" src="img/neymar.jpg" alt=""><div class="tag" style="left:18px;bottom:18px">Neymar Jr Ecosystem</div></div>
+</section>
+
+<!-- 13 · NOVA ORLA -->
+<section class="slide proj" data-nome="orla">
+  <div class="cab"><div class="k a" style="--d:.1s">Projects driving appreciation</div><div class="n a" style="--d:.2s">04</div>
+    <div class="t2 a" style="--d:.35s">New waterfront in Itapema and Porto Belo</div></div>
+  <div class="foto a dir" style="--d:.3s;left:800px;top:110px;width:1000px;height:562px"><video data-ctrl src="video/orla.mp4" poster="img/orla_rua.jpg" muted loop playsinline preload="auto"></video><div class="tag" style="left:18px;top:18px">New waterfront · Itapema City Hall</div></div>
+  <div class="foto a sobe" style="--d:.6s;left:1180px;top:600px;width:620px;height:380px"><img class="kb2" src="img/orla_planta.jpg" alt=""><div class="tag" style="left:18px;bottom:18px">Porto Belo · project</div></div>
+</section>
+
+<!-- 14 · ALARGAMENTO DA FAIXA DE AREIA -->
+<section class="slide" data-nome="alargamento">
+  <video class="fundo" data-ctrl data-ctrl-pos="right:120px;top:100px" src="video/alargamento.mp4" muted loop playsinline preload="auto"></video>
+  <div class="veu-e" style="background:linear-gradient(90deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.62) 22%,rgba(0,0,0,.2) 40%,rgba(0,0,0,0) 52%)"></div>
+  <div class="veu-b" style="background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,0) 22%)"></div>
+  <div style="position:absolute;left:120px;top:96px;width:760px">
+    <div class="k a" style="--d:.1s">Projects driving appreciation · 05</div>
+    <div class="t2 a" style="--d:.25s;margin-top:18px;font-size:58px">Widening of Meia Praia beach</div>
+  </div>
+  <div style="position:absolute;left:120px;top:390px;display:grid;grid-template-columns:repeat(2,320px);gap:14px">
+    <div class="vidro num mini-num a" style="--d:.5s"><b><span data-conta="60" data-pre="up to "></span> m</b><small>of beach width</small></div>
+    <div class="vidro num mini-num a" style="--d:.62s"><b>R$ <span data-conta="60"></span>M</b><small>City Hall + Santa Catarina State</small></div>
+    <div class="vidro num mini-num a" style="--d:.74s"><b><span data-conta="498"></span>k m³</b><small>of sand (up to)</small></div>
+    <div class="vidro num mini-num a" style="--d:.86s"><b><span data-conta="4750" data-sep="1"></span> m</b><small>length of Meia Praia</small></div>
+    <div class="vidro num mini-num a" style="--d:.98s"><b><span data-conta="4"></span> months</b><small>planned construction time</small></div>
+    <div class="vidro num mini-num a" style="--d:1.1s"><b style="font-size:28px">Hopper dredge</b><small>self-propelled</small></div>
+  </div>
+  <div class="txt a" style="--d:1.4s;position:absolute;left:120px;bottom:70px;width:1500px;font-size:23px;color:var(--c)">More space for leisure, protection against extreme weather and room for major events. Project approved by the environmental authorities.</div>
+  <div class="mini a fade" style="--d:1.8s;position:absolute;right:170px;bottom:48px">Video: Itapema City Hall</div>
+</section>
+
+<!-- 15 · MIRANTE + BONDINHO -->
+<section class="slide proj" data-nome="mirante">
+  <div class="cab"><div class="k a" style="--d:.1s">Projects driving appreciation</div><div class="n a" style="--d:.2s">06</div>
+    <div class="t2 a" style="--d:.35s;font-size:60px">Revitalization of the Mirante do Encanto lookout and a new cable car station</div></div>
+  <div class="foto a dir" style="--d:.3s;left:860px;top:110px;width:940px;height:530px"><img class="kb" src="img/mirante.jpg" alt=""><div class="tag" style="left:18px;top:18px">Mirante do Encanto</div><div class="brilho" style="--d:1s"></div></div>
+  <div class="foto a sobe" style="--d:.6s;left:1180px;top:600px;width:620px;height:380px"><img class="kb2" src="img/bondinho.jpg" alt=""><div class="tag" style="left:18px;bottom:18px">Cable car station · illustrative image</div></div>
+</section>
+
+<!-- 16 · LISTA DE PROJETOS -->
+<section class="slide" data-nome="lista">
+  <div style="position:absolute;left:120px;top:96px">
+    <div class="k a" style="--d:.1s">Projects driving appreciation · 07</div>
+    <div class="t2 a" style="--d:.25s;margin-top:18px">Healthcare, roads and city</div>
+  </div>
+  <div style="position:absolute;left:120px;right:120px;top:330px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+    <div class="vidro card a" style="--d:.45s"><div class="big">R$ <span data-conta="200"></span>M</div><div class="ct">Large private hospital complex in Porto Belo</div><div class="cd">Announced investment of roughly R$ 200 million, expanding private healthcare in the region</div></div>
+    <div class="vidro card a" style="--d:.6s"><div class="big"><span data-conta="100"></span>+ beds</div><div class="ct">New Itapema Municipal Hospital</div><div class="cd">More public healthcare capacity for the city</div></div>
+    <div class="vidro card a" style="--d:.75s"><div class="big">BR-101</div><div class="ct">Ongoing widening and upgrades (northern SC section)</div><div class="cd">Smoother logistics, fewer bottlenecks and better regional connections</div></div>
+    <div class="vidro card a" style="--d:.9s;grid-column:1 / span 1"><div class="big">Perequê</div><div class="ct">Urban renewal and new roads in Porto Belo</div><div class="cd">Road works, bridges and drainage upgrades to support population growth</div></div>
+    <div class="vidro card a" style="--d:1.05s;grid-column:2 / span 2"><div class="big">Regional hub</div><div class="ct">Growth in retail, services and regional consumer standards</div><div class="cd">Arrival and consolidation of regional-level services, clinics, dining and convenience</div></div>
+  </div>
+</section>
+
+<!-- 17 · LIMITAÇÃO GEOGRÁFICA -->
+<section class="slide" data-nome="limitacao">
+  <img class="fundo kb" src="img/litoral.jpg" alt="">
+  <div class="veu-c" style="background:linear-gradient(180deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.4) 30%,rgba(0,0,0,0) 55%)"></div>
+  <div style="position:absolute;left:120px;top:90px">
+    <div class="t1 a" style="--d:.2s;font-size:84px">The coast's geographic limits</div>
+    <div class="sub a" style="--d:.45s;margin-top:14px">Sea on one side, hills on the other. <b>Little land left for urban expansion.</b></div>
+  </div>
+  <div class="chip a" style="--d:1.2s;position:absolute;left:300px;top:720px;font-weight:700;letter-spacing:4px"><i class="pulso"></i>SEA</div>
+  <div class="chip a" style="--d:1.6s;position:absolute;left:1500px;top:640px;font-weight:700;letter-spacing:4px"><i class="pulso"></i>HILLS</div>
+  <div class="chip a" style="--d:2.0s;position:absolute;left:880px;top:420px;font-weight:700;letter-spacing:4px"><i class="pulso"></i>CITY</div>
+  <div class="chip a" style="--d:2.6s;position:absolute;left:120px;bottom:120px;background:#fff;color:#000;font-weight:700">Little room to grow = limited supply</div>
+</section>
+
+<!-- 18 · O QUE ESSE CENÁRIO CRIA -->
+<section class="slide" data-nome="cenario">
+  <div style="position:absolute;left:120px;top:96px;width:1700px">
+    <div class="k a" style="--d:.1s">Real appreciation · FipeZAP Index</div>
+    <div class="t2 a" style="--d:.25s;margin-top:18px;font-size:54px">Itapema's price per m² rose <span style="white-space:nowrap">+166%</span> in 8 years. And the major infrastructure projects are only arriving now.</div>
+  </div>
+  <div style="position:absolute;left:120px;top:380px;width:640px;display:flex;flex-direction:column;gap:30px">
+    <div class="ponto" style="--d:1.0s"><b>1</b><span>Growing demand</span></div>
+    <div class="ponto" style="--d:1.9s"><b>2</b><span>Limited supply</span></div>
+    <div class="ponto" style="--d:2.8s"><b>3</b><span>Major infrastructure projects already underway</span></div>
+    <div class="ponto" style="--d:3.7s"><b>4</b><span>Consistent appreciation over the medium and long term</span></div>
+  </div>
+  <div class="a" style="--d:.6s;position:absolute;left:840px;top:330px">
+    <div style="font-weight:800;font-size:96px;line-height:1;letter-spacing:-3px"><span data-conta="166" data-pre="+"></span>%</div>
+    <div style="font-size:24px;color:#eee;margin-top:8px"><b>R$ 5,786</b> → <b>R$ 15,403</b> per m² · Jan 2018 to Aug 2026</div>
+    <div style="font-size:21px;color:var(--c);margin-top:4px">Inflation (IPCA) over the same period: <b style="color:#eee">+55%</b></div>
+  </div>
+  <svg id="curva" viewBox="0 0 1000 640" style="position:absolute;left:820px;top:330px;width:1000px;height:640px;overflow:visible">
+    <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <filter id="gl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <clipPath id="cc"><rect id="ccr" x="0" y="-60" width="0" height="760"/></clipPath></defs>
+    <g stroke="rgba(255,255,255,.1)" stroke-width="1"><line x1="0" y1="600" x2="1000" y2="600"/><line x1="0" y1="450" x2="1000" y2="450"/><line x1="0" y1="300" x2="1000" y2="300"/><line x1="0" y1="150" x2="1000" y2="150"/></g>
+    <text x="0.0" y="632" fill="#9a9a9a" font-size="19" text-anchor="middle" font-family="P">2018</text><text x="223.7" y="632" fill="#9a9a9a" font-size="19" text-anchor="middle" font-family="P">2020</text><text x="447.4" y="632" fill="#9a9a9a" font-size="19" text-anchor="middle" font-family="P">2022</text><text x="671.1" y="632" fill="#9a9a9a" font-size="19" text-anchor="middle" font-family="P">2024</text><text x="894.8" y="632" fill="#9a9a9a" font-size="19" text-anchor="middle" font-family="P">2026</text>
+    <g clip-path="url(#cc)">
+      <path d="M 0.0 520.0 L 9.3 513.3 L 18.6 505.5 L 28.0 508.4 L 37.3 511.6 L 46.6 510.0 L 55.9 505.1 L 65.2 498.0 L 74.6 496.7 L 83.9 496.9 L 93.2 500.2 L 102.5 505.1 L 111.8 508.4 L 121.2 511.2 L 130.5 507.8 L 139.8 506.8 L 149.1 501.8 L 158.4 498.2 L 167.8 495.6 L 177.1 495.3 L 186.4 497.0 L 195.7 496.6 L 205.0 496.2 L 214.4 497.2 L 223.7 496.0 L 233.0 491.5 L 242.3 486.3 L 251.7 486.9 L 261.0 490.6 L 270.3 494.3 L 279.6 492.1 L 288.9 484.5 L 298.3 474.6 L 307.6 467.4 L 316.9 463.0 L 326.2 459.2 L 335.5 457.3 L 344.9 454.6 L 354.2 451.1 L 363.5 446.2 L 372.8 438.7 L 382.1 432.2 L 391.5 422.9 L 400.8 415.5 L 410.1 405.5 L 419.4 396.9 L 428.7 388.9 L 438.1 383.8 L 447.4 377.9 L 456.7 372.6 L 466.0 366.7 L 475.3 361.4 L 484.7 356.8 L 494.0 353.0 L 503.3 349.7 L 512.6 346.6 L 521.9 340.5 L 531.3 333.9 L 540.6 326.2 L 549.9 318.4 L 559.2 311.5 L 568.5 303.1 L 577.9 292.8 L 587.2 284.8 L 596.5 278.3 L 605.8 271.0 L 615.1 262.9 L 624.5 256.4 L 633.8 252.8 L 643.1 248.4 L 652.4 237.5 L 661.7 228.4 L 671.1 220.6 L 680.4 218.4 L 689.7 215.9 L 699.0 214.2 L 708.3 212.6 L 717.7 207.3 L 727.0 198.3 L 736.3 187.0 L 745.6 180.4 L 755.0 176.4 L 764.3 177.0 L 773.6 173.8 L 782.9 169.6 L 792.2 163.2 L 801.6 158.1 L 810.9 150.1 L 820.2 137.8 L 829.5 126.8 L 838.8 121.1 L 848.2 121.1 L 857.5 120.8 L 866.8 119.8 L 876.1 116.1 L 885.4 113.5 L 894.8 109.7 L 904.1 105.9 L 913.4 103.9 L 922.7 99.2 L 932.0 97.1 L 941.4 92.5 L 950.7 89.1 L 960.0 89.2 L 960 600 L 0 600 Z" fill="url(#ga)"/>
+      <path id="cp" d="M 0.0 520.0 L 9.3 513.3 L 18.6 505.5 L 28.0 508.4 L 37.3 511.6 L 46.6 510.0 L 55.9 505.1 L 65.2 498.0 L 74.6 496.7 L 83.9 496.9 L 93.2 500.2 L 102.5 505.1 L 111.8 508.4 L 121.2 511.2 L 130.5 507.8 L 139.8 506.8 L 149.1 501.8 L 158.4 498.2 L 167.8 495.6 L 177.1 495.3 L 186.4 497.0 L 195.7 496.6 L 205.0 496.2 L 214.4 497.2 L 223.7 496.0 L 233.0 491.5 L 242.3 486.3 L 251.7 486.9 L 261.0 490.6 L 270.3 494.3 L 279.6 492.1 L 288.9 484.5 L 298.3 474.6 L 307.6 467.4 L 316.9 463.0 L 326.2 459.2 L 335.5 457.3 L 344.9 454.6 L 354.2 451.1 L 363.5 446.2 L 372.8 438.7 L 382.1 432.2 L 391.5 422.9 L 400.8 415.5 L 410.1 405.5 L 419.4 396.9 L 428.7 388.9 L 438.1 383.8 L 447.4 377.9 L 456.7 372.6 L 466.0 366.7 L 475.3 361.4 L 484.7 356.8 L 494.0 353.0 L 503.3 349.7 L 512.6 346.6 L 521.9 340.5 L 531.3 333.9 L 540.6 326.2 L 549.9 318.4 L 559.2 311.5 L 568.5 303.1 L 577.9 292.8 L 587.2 284.8 L 596.5 278.3 L 605.8 271.0 L 615.1 262.9 L 624.5 256.4 L 633.8 252.8 L 643.1 248.4 L 652.4 237.5 L 661.7 228.4 L 671.1 220.6 L 680.4 218.4 L 689.7 215.9 L 699.0 214.2 L 708.3 212.6 L 717.7 207.3 L 727.0 198.3 L 736.3 187.0 L 745.6 180.4 L 755.0 176.4 L 764.3 177.0 L 773.6 173.8 L 782.9 169.6 L 792.2 163.2 L 801.6 158.1 L 810.9 150.1 L 820.2 137.8 L 829.5 126.8 L 838.8 121.1 L 848.2 121.1 L 857.5 120.8 L 866.8 119.8 L 876.1 116.1 L 885.4 113.5 L 894.8 109.7 L 904.1 105.9 L 913.4 103.9 L 922.7 99.2 L 932.0 97.1 L 941.4 92.5 L 950.7 89.1 L 960.0 89.2" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#gl)"/>
+      <line x1="0" y1="520.0" x2="960" y2="376.8" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-dasharray="10 10"/>
+      <text x="930" y="362.8" fill="#bbb" font-size="20" text-anchor="end" font-family="P">if it had only kept up with inflation · R$ 8,983</text>
+    </g>
+    <g id="nos"></g>
+    <path id="seta" d="M-26 -14 L 4 0 L -26 14" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+  </svg>
+  <div class="mini" style="position:absolute;left:830px;top:1000px;font-size:16px;width:900px;line-height:1.3">Source: FipeZAP Index (Fipe/ZAP) · average asking price, residential properties, Itapema · IPCA: IBGE · Past appreciation is no guarantee of future results</div>
+</section>
+
+<!-- 19 · VISTA 360° DA CIDADE -->
+<section class="slide" data-nome="tour360">
+  <img class="fundo kb" src="img/tour360.jpg" alt="" style="filter:blur(10px) brightness(.5);transform:scale(1.08)">
+  <iframe class="t360" data-src="https://virtual.my360.com.br/multi-tour/gessele-empreendimentos-lady-di/index.html" allow="fullscreen; gyroscope; accelerometer; xr-spatial-tracking" allowfullscreen title="360° view of Itapema"></iframe>
+  <div id="abrir360" class="a zoom" style="--d:.5s;display:none;position:absolute;left:0;right:0;top:400px;text-align:center">
+    <div class="t2" style="font-size:60px">360° view of Itapema</div>
+    <div class="sub" style="margin-top:16px;font-size:32px;color:var(--c)">Look around the city and see where each spot is</div>
+    <a class="btn360" href="https://virtual.my360.com.br/multi-tour/gessele-empreendimentos-lady-di/index.html" target="_blank" rel="noopener" style="position:static;display:inline-flex;margin-top:46px;height:72px;padding:0 44px;font-size:23px;background:#fff;color:#000;border-color:#fff;text-decoration:none">Open the 360° view ↗</a>
+  </div>
+  <div class="vidro a" style="--d:.3s;position:absolute;left:64px;top:44px;padding:18px 30px;pointer-events:none">
+    <div class="k" style="font-size:17px;letter-spacing:5px">360° view · Itapema</div>
+    <div style="font-weight:600;font-size:26px;margin-top:8px">Drag to look around · click the points to change location</div>
+  </div>
+  <div class="btn360 a" style="--d:.6s;left:64px;bottom:44px" data-vai="-1">← Back</div>
+  <div class="btn360 a" style="--d:.7s;left:252px;bottom:44px" data-vai="0">Start</div>
+  <div class="btn360 a" style="--d:.8s;right:64px;bottom:44px" data-vai="1">Next →</div>
+</section>
+
+<!-- 19 · CTA -->
+<section class="slide" data-nome="cta">
+  <img class="fundo kb" src="img/pier.jpg" alt="" style="filter:blur(18px) brightness(.32) saturate(.8);transform:scale(1.1)">
+  <div class="raios"><i style="--x:12%;--d:.0s"></i><i style="--x:30%;--d:.4s"></i><i style="--x:52%;--d:.2s"></i><i style="--x:71%;--d:.6s"></i><i style="--x:88%;--d:.3s"></i></div>
+  <div id="resumo" style="position:absolute;left:0;right:0;top:190px;display:flex;justify-content:center;gap:18px">
+    <div class="chip junta" style="--x:280px;--d:.2s">Growing demand</div>
+    <div class="chip junta" style="--x:0px;--d:.35s">Limited supply</div>
+    <div class="chip junta" style="--x:-280px;--d:.5s">Projects underway</div>
+  </div>
+  <div style="position:absolute;left:0;right:0;top:380px;text-align:center">
+    <div class="a" style="--d:1.9s;font-weight:300;font-size:58px;letter-spacing:-.5px">Now, let me show you</div>
+    <div style="font-weight:800;font-size:104px;line-height:1.08;letter-spacing:-2.5px;margin-top:10px">
+      <span class="palavra" style="animation-delay:2.25s">an</span> <span class="palavra" style="animation-delay:2.38s">opportunity</span><br>
+      <span class="palavra" style="animation-delay:2.55s">that</span> <span class="palavra" style="animation-delay:2.68s">makes</span> <span class="palavra" style="animation-delay:2.81s">sense</span>
+    </div>
+    <div class="a" style="--d:3.2s;font-weight:300;font-size:58px;margin-top:14px">in this scenario.</div>
+    <div class="linha a cresce" style="--d:3.6s;width:260px;margin:46px auto 0;transform-origin:50% 50%"></div>
+  </div>
+  <div class="a" style="--d:4s;position:absolute;left:0;right:0;bottom:120px;display:flex;justify-content:center;align-items:center;gap:30px">
+    <img src="img/logo.png" style="width:120px" alt="">
+    <div style="width:1px;height:80px;background:rgba(255,255,255,.4)"></div>
+    <div style="text-align:left"><div style="font-weight:700;font-size:30px">Alan Teixeira</div><div style="font-size:22px;color:var(--c)">Broker · New Life</div></div>
+  </div>
+</section>
+
+</div>
+
+<style>
+/* rotas (slide 7) */
+.rota{display:grid;grid-template-columns:1fr auto 96px;align-items:baseline;gap:14px;padding:12px 20px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);opacity:0;transform:translateX(-30px);transition:all .7s var(--e)}
+.rota span{font-weight:600;font-size:23px;white-space:nowrap}.rota em{font-style:normal;font-weight:800;font-size:25px}.rota i{font-style:normal;font-size:20px;color:var(--c);text-align:right}
+.rota.av span::before{content:"✈ ";font-family:system-ui}
+.rota.vis{opacity:1;transform:none}.rota.vis.nova{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5)}
+/* gráfico de barras (slide 8) */
+.lg{display:inline-block;width:18px;height:18px;border-radius:4px;margin-right:8px;vertical-align:-3px}
+.pt{width:12px;height:12px;border-radius:50%;background:#fff;margin-top:16px;box-shadow:0 0 0 6px rgba(255,255,255,.15);flex:none}
+.grupo{position:relative;display:flex;gap:16px;align-items:flex-end;height:100%;width:360px;justify-content:center}
+.bar{position:relative;width:100px;height:calc(var(--h) * 100%);border-radius:14px 14px 0 0;transform:scaleY(0);transform-origin:50% 100%}
+.b10{background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.18))}
+.b22{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.42))}
+.b26{background:linear-gradient(180deg,#fff,#d9d9d9);box-shadow:0 0 40px rgba(255,255,255,.25)}
+.on .bar{animation:barra 1.3s var(--e) forwards;animation-delay:var(--d)}
+@keyframes barra{to{transform:scaleY(1)}}
+.bar span{position:absolute;left:50%;top:-44px;transform:translateX(-50%);font-weight:700;font-size:23px;white-space:nowrap}
+.b22 span{color:#fff}
+.nome{position:absolute;bottom:-62px;left:0;right:0;text-align:center;font-weight:600;font-size:28px}
+.selo{position:absolute;top:-150px;right:-30px;background:#fff;color:#000;font-weight:800;font-size:24px;padding:9px 20px;border-radius:999px;opacity:0;transform:scale(.6);white-space:nowrap}
+.on .selo{animation:pop .7s cubic-bezier(.3,1.6,.5,1) forwards;animation-delay:var(--d)}
+@keyframes pop{to{opacity:1;transform:scale(1)}}
+/* números (slide 14) */
+.num{padding:26px 28px;min-height:150px}.mini-num{padding:16px 20px;min-height:0;background:rgba(10,12,16,.62)}.mini-num b{font-size:30px}.mini-num small{font-size:17px;margin-top:6px}.num b{display:block;font-weight:800;font-size:54px;line-height:1.05;white-space:nowrap}.num small{display:block;margin-top:10px;font-size:20px;color:var(--c);line-height:1.35}
+/* cartões (slide 16) */
+.card{padding:34px 36px;min-height:270px}.card .big{font-weight:800;font-size:56px;line-height:1}.card .ct{font-weight:600;font-size:27px;margin-top:20px;line-height:1.3}.card .cd{font-size:22px;color:var(--c);margin-top:12px;line-height:1.45}
+/* anotação (slide 17) */
+.anota path{fill:none;stroke:#fff;stroke-width:3;stroke-dasharray:12 12;opacity:.0}
+.on .anota .trac{animation:traco 1.6s ease forwards;animation-delay:var(--d)}
+@keyframes traco{from{opacity:.9;stroke-dashoffset:900}to{opacity:.9;stroke-dashoffset:0}}
+.pulso{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:pulso 1.6s infinite}
+@keyframes pulso{to{box-shadow:0 0 0 18px rgba(255,255,255,0)}}
+/* pontos (slide 18) */
+.ponto{display:flex;align-items:center;gap:26px;opacity:.18;transition:opacity .6s,transform .6s;transform:translateX(-20px)}
+.ponto b{width:62px;height:62px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-weight:700;font-size:26px;flex:none;transition:all .6s}
+.ponto span{font-weight:600;font-size:34px;line-height:1.25}
+.ponto.vis{opacity:1;transform:none}.ponto.vis b{background:#fff;color:#000;box-shadow:0 0 30px rgba(255,255,255,.6)}
+/* CTA (slide 19) */
+.raios{position:absolute;inset:0;overflow:hidden}
+.raios i{position:absolute;top:-20%;left:var(--x);width:2px;height:140%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.35),transparent);transform:rotate(18deg);opacity:0}
+.on .raios i{animation:raio 6s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes raio{0%,100%{opacity:0;transform:rotate(18deg) translateY(-8%)}50%{opacity:1;transform:rotate(18deg) translateY(8%)}}
+.junta{opacity:0}
+.on .junta{animation:junta 2s var(--e) forwards;animation-delay:var(--d)}
+@keyframes junta{0%{opacity:0;transform:translateY(30px)}25%{opacity:1;transform:none}70%{opacity:1;transform:none;filter:blur(0)}100%{opacity:0;transform:translateX(var(--x)) scale(.6);filter:blur(8px)}}
+</style>
+
+<script>
+const palco = document.getElementById("palco");
+function ajusta(){ const s = Math.min(innerWidth/1920, innerHeight/1080); palco.style.transform = `scale(${s}) translate(-50%,-50%)`; palco.style.left = "50%"; palco.style.top = "50%"; palco.style.transformOrigin = "0 0"; palco.style.transform = `translate(-50%,-50%) scale(${s})`; palco.style.transformOrigin = "50% 50%"; }
+addEventListener("resize", ajusta); ajusta();
+
+// logos das construtoras (slide 5)
+const LOGOS = ["dallo","profor","voltolini","kada","jarussi","embraed","seger","reskatrin","fg","triad","gthome","gessele"];
+document.getElementById("logos").innerHTML = LOGOS.map((n,i)=>`<div class="a zoom" style="--d:${(1.0+i*0.09).toFixed(2)}s;height:220px;border-radius:20px;background:#000;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;padding:22px;position:relative;overflow:hidden"><img src="img/logos/${n}.png" style="max-width:100%;max-height:150px" alt="${n}"><div class="brilho" style="--d:${(1.4+i*0.09).toFixed(2)}s"></div></div>`).join("");
+
+// nós da curva (slide 18)
+const cp = document.getElementById("cp"), L = cp.getTotalLength(), FR = [0.0, 0.36, 0.66, 0.995];
+document.getElementById("nos").innerHTML = FR.map((f,i)=>{ const p = cp.getPointAtLength(f*L); return `<g class="no" data-i="${i}" opacity="0"><circle cx="${p.x}" cy="${p.y}" r="26" fill="none" stroke="#fff" stroke-width="2" opacity=".5"/><circle cx="${p.x}" cy="${p.y}" r="11" fill="#fff"/></g>`; }).join("");
+
+// hospedado (claude.ai/claudeusercontent) bloqueia iframe de outro site: o slide 360 vira foto + botão que abre numa aba nova
+const MODO_LINK = /claudeusercontent\.com$|claude\.ai$/.test(location.hostname);
+addEventListener("securitypolicyviolation", e => { if (/frame-src|child-src/.test(e.violatedDirective)) { const s = slides[atual]; if (s && s.dataset.nome === "tour360") { s.querySelector("iframe").style.display = "none"; s.querySelector(".vidro").style.display = "none"; document.getElementById("abrir360").style.display = "block"; } } });
+const slides = [...document.querySelectorAll(".slide")];
+const num = document.getElementById("num"), barra = document.getElementById("barra"), marca = document.getElementById("marca"), dica = document.getElementById("dica");
+let atual = -1, timers = [], raf = 0;
+const later = (ms, f) => timers.push(setTimeout(f, ms));
+const fmt = (v, sep) => sep ? Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+function contadores(s){
+  s.querySelectorAll("[data-conta]").forEach(el => {
+    const alvo = +el.dataset.conta, pre = el.dataset.pre || "";
+    const host = el.closest("[style*='--d']"); const d = host ? parseFloat(getComputedStyle(host).getPropertyValue("--d")) || 0 : 0;
+    el.textContent = pre + "0";
+    later(d*1000 + 250, () => { const t0 = performance.now(), dur = 1400;
+      const passo = (t) => { const u = Math.min(1, (t - t0)/dur), e = 1 - Math.pow(1-u, 3); el.textContent = pre + fmt(alvo*e); if (u < 1 && atual === slides.indexOf(s)) requestAnimationFrame(passo); };
+      requestAnimationFrame(passo); });
+  });
+}
+
+function curva(s){
+  const r = document.getElementById("ccr"), seta = document.getElementById("seta"), nos = [...s.querySelectorAll(".no")], pts = [...s.querySelectorAll(".ponto")];
+  r.setAttribute("width", 0); seta.setAttribute("opacity", 0); nos.forEach(n => n.setAttribute("opacity", 0)); pts.forEach(p => p.classList.remove("vis"));
+  const t0 = performance.now() + 900, dur = 3200;
+  const passo = (t) => { if (atual !== slides.indexOf(s)) return; const u = Math.max(0, Math.min(1, (t - t0)/dur)), e = u<.5 ? 4*u*u*u : 1 - Math.pow(-2*u+2,3)/2;
+    r.setAttribute("width", e*1000);
+    FR.forEach((f,i) => { if (e >= f - 0.002) { nos[i].setAttribute("opacity", 1); pts[i].classList.add("vis"); } });
+    const p = cp.getPointAtLength(Math.max(0.001, e)*L), q = cp.getPointAtLength(Math.max(0, e*L - 6)); const ang = Math.atan2(p.y - q.y, p.x - q.x)*180/Math.PI;
+    seta.setAttribute("transform", `translate(${p.x},${p.y}) rotate(${ang})`); seta.setAttribute("opacity", e > 0.02 ? 1 : 0);
+    if (u < 1) raf = requestAnimationFrame(passo); };
+  raf = requestAnimationFrame(passo);
+}
+
+function rotas(s){
+  const v = s.querySelector("video"), itens = [...s.querySelectorAll(".rota")];
+  itens.forEach(i => i.classList.remove("vis","nova"));
+  const passo = () => { if (atual !== slides.indexOf(s)) return; const t = v.currentTime;
+    itens.forEach(i => { const ti = +i.dataset.t; if (t >= ti) i.classList.add("vis"); i.classList.toggle("nova", t >= ti && t < ti + 1.6); });
+    if (!v.ended) raf = requestAnimationFrame(passo); else itens.forEach(i => i.classList.add("vis")); };
+  raf = requestAnimationFrame(passo);
+}
+
+function vai(n){
+  n = Math.max(0, Math.min(slides.length - 1, n)); if (n === atual) return;
+  timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf);
+  if (atual >= 0) { const v = slides[atual]; v.classList.remove("on"); v.querySelectorAll("video").forEach(x => x.pause()); }
+  atual = n; const s = slides[n];
+  void s.offsetWidth; s.classList.add("on");
+  s.querySelectorAll("video").forEach(x => { try { x.currentTime = 0; } catch(e){} const p = x.play(); if (p) p.catch(()=>{}); });
+  contadores(s);
+  const fr = s.querySelector("iframe[data-src]"); if (fr && !fr.src) { if (MODO_LINK) { fr.style.display = "none"; s.querySelector(".vidro").style.display = "none"; document.getElementById("abrir360").style.display = "block"; } else fr.src = fr.dataset.src; }
+  if (s.dataset.nome === "cenario") curva(s);
+  if (s.dataset.nome === "local") rotas(s);
+  num.textContent = String(n+1).padStart(2,"0") + " / " + String(slides.length).padStart(2,"0");
+  barra.style.width = ((n+1)/slides.length*100) + "%";
+  marca.classList.toggle("esconde", ["capa","cta","tour360"].includes(s.dataset.nome));
+  num.classList.toggle("esconde", n === 0 || s.dataset.nome === "tour360");
+  if (n > 0) dica.classList.add("esconde");
+  // pré-carrega o vídeo do próximo slide
+  const prox = slides[n+1]; if (prox) prox.querySelectorAll("video").forEach(x => { if (x.preload !== "auto") x.preload = "auto"; });
+  try { history.replaceState(null, "", "#" + (n+1)); } catch(e){}
+}
+
+
+// controles de play/pausa nos vídeos marcados com data-ctrl
+const ICO = '<svg class="ip" viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg><svg class="ipl" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg><span class="lb"></span>';
+function alterna(v){ if (v.paused) { const p = v.play(); if (p) p.catch(()=>{}); } else v.pause(); }
+document.querySelectorAll("video[data-ctrl]").forEach(v => {
+  const b = document.createElement("div"); b.className = "ctrl"; b.innerHTML = ICO; b.title = "Play / pause (P key)";
+  if (v.dataset.ctrlPos) b.style.cssText = v.dataset.ctrlPos;
+  const host = v.closest(".foto") || v.closest(".slide"); host.appendChild(b);
+  const sync = () => b.classList.toggle("tocando", !v.paused && !v.ended);
+  ["play","pause","ended","playing"].forEach(ev => v.addEventListener(ev, sync)); sync();
+  b.addEventListener("click", e => { e.stopPropagation(); alterna(v); });
+  if (v.closest(".foto")) v.addEventListener("click", e => { e.stopPropagation(); alterna(v); });
+});
+// botões do slide 360 (o tour captura o mouse e o teclado, então ele tem botões próprios)
+document.querySelectorAll(".btn360").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); if (!("vai" in b.dataset)) return; const d = +b.dataset.vai; vai(d === 0 ? 0 : atual + d); }));
+
+// vídeo institucional opcional: se midia/institucional.mp4 existir, toca no lugar da foto
+const vi = document.getElementById("videoInst");
+vi.addEventListener("loadeddata", () => { vi.style.display = "block"; document.getElementById("fotoInst").style.display = "none"; vi.muted = false; });
+vi.addEventListener("error", () => {});
+
+addEventListener("keydown", e => {
+  if (["ArrowRight","PageDown"," ","Enter"].includes(e.key)) { e.preventDefault(); vai(atual+1); }
+  else if (["ArrowLeft","PageUp","Backspace"].includes(e.key)) { e.preventDefault(); vai(atual-1); }
+  else if (e.key === "p" || e.key === "P" || e.key === "k" || e.key === "K") { const v = slides[atual].querySelector("video[data-ctrl]"); if (v) alterna(v); }
+  else if (e.key === "Home") vai(0); else if (e.key === "End") vai(slides.length-1);
+  else if (e.key === "f" || e.key === "F") { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); }
+});
+addEventListener("click", e => { if (e.clientX < innerWidth*0.25) vai(atual-1); else vai(atual+1); });
+// vídeo que ainda não tinha carregado quando o slide abriu: toca assim que puder; e na 1ª interação do usuário, garante o play do slide atual
+function tocaAtual(e){ if (e && e.type === "keydown" && /^[pk]$/i.test(e.key)) return; const s = slides[atual]; if (!s) return; s.querySelectorAll("video").forEach(x => { if (x.paused) { const p = x.play(); if (p) p.catch(()=>{}); } }); }
+document.querySelectorAll("video").forEach(v => v.addEventListener("canplay", () => { if (v.closest(".slide") === slides[atual] && v.paused) { const p = v.play(); if (p) p.catch(()=>{}); } }));
+["pointerdown","keydown","touchstart"].forEach(ev => addEventListener(ev, tocaAtual, { once: true, capture: true }));
+const ini = parseInt((location.hash||"").slice(1)); vai(isNaN(ini) ? 0 : ini-1);
+</script>
+</body>
+</html>
